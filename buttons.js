@@ -1,121 +1,67 @@
-const addButton = (selector, options = {}) => {
-  const props = { tooltip: "Copiar", addClass: "", copyType: "", ...options };
-  const element = document.querySelector(selector);
-  if (element) {
-    element.classList.add(props.addClass);
-    element.insertAdjacentHTML(
-      "beforeend",
+((s, n, t) => {
+  const $ = (selector) => n.querySelector(selector);
+  const $$ = (selector) => n.querySelectorAll(selector);
+  const textFormat = (text) => {
+    const textReplace = text
+      .replace(/\(.+!?\)/g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s+$/g, '')
+      .replace(/^\s+/g, '');
+    return textReplace;
+  };
+  const copy = (text) => s.navigator.clipboard.writeText(text);
+  const refInsert = $('.header');
+  const titleElement = $('.title-content h1');
+  const singerElement = $('.title-content .textStyle-secondary');
+  const lyricElement = $('.lyric-original');
+
+  if (titleElement && singerElement && lyricElement) {
+    refInsert.insertAdjacentHTML(
+      'beforeend',
       `
-        <button class="lyrics-extension__button" data-title="${props.tooltip}" data-copy="${props.copyType}">
-          &#x2398;
-        </button>
+      <style>
+        ${t} {display: flex;padding: 8px;column-gap: 8px;background-color: #fff;}
+        [data-${t}-button] {flex: 1;padding: 16px;font-size: 32px;line-height: normal;border-radius: 8px;background-color: #d9dd00;color: #000;text-transform: uppercase;font-weight: bolder;}
+        [data-${t}-thumb] {width: 56px;height: 56px;background-color: #000;border-radius: 50%;align-self: center;text-align: center;line-height: 56px;overflow: hidden;}
+        [data-${t}-thumb-img] {width: inherit;height: inherit;object-fit: contain;}
+      </style>
+      <${t}>
+        <div data-${t}-thumb>
+          <img data-${t}-thumb-img src="https://cdns-images.dzcdn.net/images/talk/98453d8d2a642f70892b131eed53b3f1/1000x1000.jpg" alt="" aria-hidden="true" />
+        </div>
+        <button type="button" data-${t}-button="title">Copiar título</button>
+        <button type="button" data-${t}-button="lyric">Copiar letra</button>
+      </${t}>
       `
     );
+
+    [...$$(`[data-${t}-button]`)].forEach((item) => {
+      item.addEventListener('click', (e) => {
+        const type = e.target.getAttribute(`data-${t}-button`);
+        const typeConfig = {
+          title: () => {
+            const { innerText: title } = titleElement;
+            const { innerText: singer } = singerElement;
+            const titleFormat = textFormat(title);
+            const singerFormat = textFormat(singer);
+            const titleContent = `${titleFormat} - ${singerFormat}`;
+            copy(titleContent);
+          },
+          lyric: () => {
+            const { innerText: lyric } = lyricElement;
+            const verse = [];
+            const lyricSplit = lyric.split(/\n/g);
+            const lines = lyricSplit.map((item) => textFormat(item)).filter((item) => item);
+            lines.forEach((item, i) => {
+              i % 2 === 0 ? verse.push([item]) : verse.at(-1).push(item);
+            });
+            const verseJoin = verse.map((item) => item.join('\n'));
+            const verseFinal = [...new Set(verseJoin)].join('\n\n');
+            copy(verseFinal);
+          },
+        };
+        typeConfig[type] ? typeConfig[type]() : null;
+      });
+    });
   }
-};
-
-document.head.insertAdjacentHTML(
-  "beforeend",
-  `
-    <style>
-      .lyrics-extension__title {
-        display: flex;
-        align-items: flex-start;
-        .--type-title{
-          flex: 1;
-        }
-      }
-      .lyrics-extension__button {
-        font-size: 24px;
-        width: 32px;
-        height: 32px;
-        border: 1px solid #ccc;
-        background: #ddd;
-        color:#000;
-        border-radius: 4px;
-        position: relative;
-        z-index: 4;
-        &:hover {
-          &:after,
-          &:before {
-            filter: opacity(1);
-          }
-        }
-        &:after,
-        &:before {
-          position: absolute;
-          top: 50%;
-          left: 100%;
-          pointer-events: none;
-          filter: opacity(0);
-          will-change: filter;
-        }
-        &:after {
-          content: '';
-          border: 6px solid transparent;
-          border-right-color: #fff;
-          transform: translate(-4px, -50%);
-          z-index: 3;
-        }
-        &:before {
-          content: attr(data-title);
-          white-space: nowrap;
-          z-index: 2;
-          margin-left: 6px;
-          background: #fff;
-          font-size: 14px;
-          border-radius: 4px;
-          transform: translate(0%, -50%);
-          box-shadow: 0 0 10px #666;
-          padding: 8px 12px;
-        }
-      }
-    </style>
-  `
-);
-addButton(".title-content", {
-  tooltip: "Copiar título",
-  addClass: "lyrics-extension__title",
-  copyType: "title",
-});
-addButton(".lyric-filter", {
-  tooltip: "Copiar letra",
-  addClass: "lyrics-extension__lyric",
-  copyType: "lyric",
-});
-
-[...document.querySelectorAll(".lyrics-extension__button")].forEach((item) => {
-  item.addEventListener("click", (e) => {
-    const {
-      currentTarget: {
-        dataset: { copy },
-      },
-    } = e;
-    const types = {
-      title: () => {
-        const { innerText: title } =
-          document.querySelector(".title-content h1");
-        const { innerText: singer } = document.querySelector(
-          ".title-content .textStyle-secondary"
-        );
-        const normalizeTitle = title.replace(/\(.+!?\)/, "");
-        const titleNoSpace = normalizeTitle.replace(/\s+/, " ");
-        const titleContent = `${titleNoSpace} - ${singer}`;
-        navigator.clipboard.writeText(titleContent);
-      },
-      lyric: () => {
-        const { innerText } = document.querySelector(".lyric-original");
-        const verse = [];
-        const regex = innerText.split(/\n/g);
-        const lines = regex.filter((item) => item);
-        lines.forEach((item, i) => {
-          i % 2 === 0 ? verse.push([item]) : verse.at(-1).push(item);
-        });
-        const verseJoin = verse.map((item) => item.join("\n"));
-        const verseFinal = verseJoin.join("\n\n");
-        navigator.clipboard.writeText(verseFinal);
-      },
-    };
-    types[copy] ? types[copy]() : null;
-  });
-});
+})(globalThis, document, 'lyrics-extension');
