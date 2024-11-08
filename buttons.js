@@ -1,6 +1,6 @@
 ((s, n, t) => {
   const $ = (selector) => n.querySelector(selector);
-  const $$ = (selector) => n.querySelectorAll(selector);
+  const $$ = (selector) => [...n.querySelectorAll(selector)];
   const textFormat = (text) => {
     const textReplace = text
       .replace(/\(.+!?\)/g, '')
@@ -14,12 +14,14 @@
   const titleElement = $('.title-content h1');
   const singerElement = $('.title-content .textStyle-secondary');
   const lyricElement = $('.lyric-original');
+  const adsSelector = $$('ins,.fc-ab-root');
 
   if (titleElement && singerElement && lyricElement) {
     refInsert.insertAdjacentHTML(
       'beforeend',
       `
       <style>
+        #body {padding-top: 160px;}
         ${t} {display: flex;padding: 8px;column-gap: 8px;background-color: #fff;}
         [data-${t}-button] {flex: 1;padding: 16px;font-size: 32px;line-height: normal;border-radius: 8px;background-color: #d9dd00;color: #000;text-transform: uppercase;font-weight: bolder;}
         [data-${t}-thumb] {width: 56px;height: 56px;background-color: #000;border-radius: 50%;align-self: center;text-align: center;line-height: 56px;overflow: hidden;}
@@ -64,4 +66,12 @@
       });
     });
   }
+
+  setTimeout(() => {
+    adsSelector.forEach((item) => {
+      if (item) {
+        item.remove();
+      }
+    });
+  }, 600);
 })(globalThis, document, 'lyrics-extension');
