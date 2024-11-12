@@ -33,8 +33,4 @@ Uma extensão para ser utilizada no Google Chrome, onde cria-se botões no topo 
   - Transformar título e letras em letras maiúsculas
 
 ## Novas solicitações
-Crie uma nova issue neste repositório, e aguarde um feedback do time de desenvolvimento da Sara Nossa Terra Augusta
-
-
-
-
+Crie uma [nova issue](https://github.com/sntaugusta/augusta-lyrics-extension/issues/new) neste repositório, e aguarde um feedback do time de desenvolvimento da Sara Nossa Terra Augusta
