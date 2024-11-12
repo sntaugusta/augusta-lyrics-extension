@@ -14,25 +14,24 @@
   const titleElement = $('.title-content h1');
   const singerElement = $('.title-content .textStyle-secondary');
   const lyricElement = $('.lyric-original');
-  const adsSelector = $$('ins,.fc-ab-root');
 
   if (titleElement && singerElement && lyricElement) {
     refInsert.insertAdjacentHTML(
       'beforeend',
       `
       <style>
-        #body {padding-top: 160px;}
-        ${t} {display: flex;padding: 8px;column-gap: 8px;background-color: #fff;}
-        [data-${t}-button] {flex: 1;padding: 16px;font-size: 32px;line-height: normal;border-radius: 8px;background-color: #d9dd00;color: #000;text-transform: uppercase;font-weight: bolder;}
-        [data-${t}-thumb] {width: 56px;height: 56px;background-color: #000;border-radius: 50%;align-self: center;text-align: center;line-height: 56px;overflow: hidden;}
-        [data-${t}-thumb-img] {width: inherit;height: inherit;object-fit: contain;}
+      #body {padding-top: 160px;}
+      ${t} {display: flex;padding: 8px;column-gap: 8px;background-color: #fff;}
+      [data-${t}-button] {flex: 1;padding: 16px;font-size: 32px;line-height: normal;border-radius: 8px;background-color: #d9dd00;color: #000;text-transform: uppercase;font-weight: bolder;}
+      [data-${t}-thumb] {width: 56px;height: 56px;background-color: #000;border-radius: 50%;align-self: center;text-align: center;line-height: 56px;overflow: hidden;}
+      [data-${t}-thumb-img] {width: inherit;height: inherit;object-fit: contain;}
       </style>
       <${t}>
-        <div data-${t}-thumb>
-          <img data-${t}-thumb-img src="https://cdns-images.dzcdn.net/images/talk/98453d8d2a642f70892b131eed53b3f1/1000x1000.jpg" alt="" aria-hidden="true" />
-        </div>
-        <button type="button" data-${t}-button="title">Copiar título</button>
-        <button type="button" data-${t}-button="lyric">Copiar letra</button>
+      <div data-${t}-thumb>
+      <img data-${t}-thumb-img src="https://cdns-images.dzcdn.net/images/talk/98453d8d2a642f70892b131eed53b3f1/1000x1000.jpg" alt="" aria-hidden="true" />
+      </div>
+      <button type="button" data-${t}-button="title">Copiar título</button>
+      <button type="button" data-${t}-button="lyric">Copiar letra</button>
       </${t}>
       `
     );
@@ -67,11 +66,14 @@
     });
   }
 
-  setTimeout(() => {
-    adsSelector.forEach((item) => {
-      if (item) {
-        item.remove();
-      }
-    });
-  }, 600);
+  const interval = 1000;
+  let intervalADS = 0;
+  new Promise((resolve) => {
+    intervalADS = setInterval(
+      () => $$('ins, .fc-ab-root').forEach((item) => (item ? resolve(item) : null)),
+      interval / 100
+    );
+  })
+    .then((item) => item.remove())
+    .finally(() => setTimeout(() => clearInterval(intervalADS), interval));
 })(globalThis, document, 'lyrics-extension');

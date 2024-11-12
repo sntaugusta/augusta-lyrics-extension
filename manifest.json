@@ -1,7 +1,7 @@
 {
   "name": "Augusta Lyrics Extension",
   "description": "Uma extensão do Google Chrome para criar botões de copiar títulos e letras de músicas para a projeção da igreja",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "manifest_version": 3,
   "icons": {
     "16": "favicon-16.png",
